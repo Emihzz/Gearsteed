@@ -1,0 +1,193 @@
+════════════════════════════════════════════════════════════════════════
+GUÍA RÁPIDA PARA ASISTENTE IA - GEARSTEED PROJECT
+════════════════════════════════════════════════════════════════════════
+
+📋 RESUMEN EN 30 SEGUNDOS:
+- Concesionaria online: vehículos (solo ver) + refacciones (comprar)
+- Sistema login/registro completo
+- Carrito de compras funcional
+- 9 HTML pages, auth.js (core), estilos compartidos
+
+════════════════════════════════════════════════════════════════════════
+🎯 REGLAS DE ORO
+════════════════════════════════════════════════════════════════════════
+
+1. VEHÍCULOS (vehiculos.html) = SOLO VER, NO COMPRAR
+2. REFACCIONES (historia.html) = SÍ SE PUEDEN COMPRAR
+3. auth.js = NUNCA tocar función addToCart() normalización
+4. carrito.html = auth.js SIN defer
+5. localStorage keys = NO cambiar nombres
+
+════════════════════════════════════════════════════════════════════════
+📁 ARCHIVOS CRÍTICOS
+════════════════════════════════════════════════════════════════════════
+
+auth.js (503 líneas)
+├── Autenticación: login(), register(), logout(), isAuthenticated()
+├── Carrito: addToCart(), getCart(), updateCartQuantity(), removeFromCart()
+├── UI: updateCartUI(), showCartNotification()
+└── ⚠️ Normaliza español↔inglés automáticamente
+
+historia.html
+├── 9 productos comprables (refacciones)
+├── onclick="addRefaccionToCart(name, price, sku)"
+├── MutationObserver protege DOM de script.js
+└── Botones con !important para visibilidad
+
+carrito.html
+├── <script src="auth.js"></script> ← SIN defer
+├── migrateOldCartData() - migración automática
+├── Cupones: DESCUENTO10 (10%), DESCUENTO20 (20%), GEARSTEED (15%)
+├── IVA 16%, Envío $200
+└── Requiere login para checkout
+
+════════════════════════════════════════════════════════════════════════
+🔑 LOCALSTORAGE KEYS (NO CAMBIAR)
+════════════════════════════════════════════════════════════════════════
+
+'cart' → [{id, name, price, image, quantity, sku, agregado_en}, ...]
+'gearsteed_user' → {email, firstName, lastName, createdAt}
+'gearsteed_token' → JWT string
+'gearsteed_session' → session ID
+
+════════════════════════════════════════════════════════════════════════
+⚡ FUNCIONES MÁS USADAS
+════════════════════════════════════════════════════════════════════════
+
+getCart() → array de productos
+addToCart({id, name, price, sku, quantity}) → agrega y normaliza
+updateCartQuantity(index, qty) → cambia cantidad
+removeFromCart(index) → elimina producto
+isAuthenticated() → boolean
+getCurrentUser() → object | null
+getCartTotal() → number (subtotal)
+getCartItemCount() → number (cantidad items)
+
+════════════════════════════════════════════════════════════════════════
+🐛 PROBLEMAS COMUNES Y SOLUCIONES
+════════════════════════════════════════════════════════════════════════
+
+❌ "getCart is not a function"
+   → Verificar: <script src="auth.js"></script> (sin defer en carrito.html)
+
+❌ Botones invisibles en historia.html
+   → Agregar: style="display:block !important; visibility:visible !important;"
+
+❌ Carrito muestra 0 pero hay productos
+   → Ejecutar en consola: localStorage.clear(); location.reload();
+
+❌ Total incorrecto
+   → Verificar: price es number, no string (addToCart() lo convierte)
+
+❌ Productos duplicados
+   → Verificar: id debe ser único (usar SKU como id)
+
+════════════════════════════════════════════════════════════════════════
+➕ AGREGAR NUEVO PRODUCTO (historia.html)
+════════════════════════════════════════════════════════════════════════
+
+<button onclick="addRefaccionToCart('Nombre', PRECIO, 'SKU-XXX')"
+        style="background: linear-gradient(135deg, #ff6b35 0%, #ff8c61 100%) !important;
+               display: block !important;
+               visibility: visible !important;">
+    <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+</button>
+
+⚠️ Precio SIN $ ni comas (usar punto: 1299.99)
+⚠️ SKU único
+⚠️ Mantener !important
+
+════════════════════════════════════════════════════════════════════════
+➕ AGREGAR NUEVO CUPÓN (carrito.html)
+════════════════════════════════════════════════════════════════════════
+
+En función applyCoupon(), agregar a validCoupons:
+
+'CODIGO': { percentage: 15, description: '15% descuento' }
+
+════════════════════════════════════════════════════════════════════════
+🔧 COMANDOS DE DEBUGGING (consola navegador)
+════════════════════════════════════════════════════════════════════════
+
+Ver carrito:
+  console.table(getCart());
+
+Limpiar todo:
+  localStorage.clear(); location.reload();
+
+Ver usuario:
+  console.log(getCurrentUser());
+
+Agregar test:
+  addToCart({id:'T1', name:'Test', price:100, sku:'T1', quantity:1});
+
+Verificar auth:
+  console.log(isAuthenticated());
+
+════════════════════════════════════════════════════════════════════════
+📋 CHECKLIST ANTES DE MODIFICAR
+════════════════════════════════════════════════════════════════════════
+
+□ ¿Leíste la documentación completa? (DOCUMENTACION_PROYECTO.txt)
+□ ¿Sabes qué archivo modificar?
+□ ¿Verificaste que no romperás compatibilidad?
+□ ¿Harás backup antes de cambios grandes?
+□ ¿Probaste en navegador después de modificar?
+□ ¿Verificaste consola para errores?
+□ ¿Actualizaste esta documentación si agregaste features?
+
+════════════════════════════════════════════════════════════════════════
+📊 ESTADO ACTUAL DEL PROYECTO
+════════════════════════════════════════════════════════════════════════
+
+✅ Sistema de autenticación COMPLETO
+✅ Carrito de compras FUNCIONAL
+✅ 9 refacciones comprables en historia.html
+✅ Cupones de descuento IMPLEMENTADOS
+✅ Vehículos en vehiculos.html (solo visualización)
+✅ 6 páginas con header unificado
+✅ Responsive design
+✅ Notificaciones y feedback visual
+✅ Protección DOM con MutationObserver
+✅ Migración automática de datos
+✅ Compatible español/inglés en propiedades
+✅ LocalStorage persistence
+✅ PROBADO Y FUNCIONANDO
+
+════════════════════════════════════════════════════════════════════════
+🚀 PRÓXIMOS PASOS SUGERIDOS
+════════════════════════════════════════════════════════════════════════
+
+PRIORIDAD ALTA:
+□ checkout.html (finalizar compra)
+□ Imágenes reales de productos
+□ Mi Cuenta page (perfil usuario)
+□ Mis Pedidos page (historial)
+
+PRIORIDAD MEDIA:
+□ Backend API connection
+□ Base de datos real
+□ Sistema de pago (Stripe/PayPal)
+□ Emails de confirmación
+□ Búsqueda y filtros
+
+PRIORIDAD BAJA:
+□ Reviews y ratings
+□ Wishlist
+□ Comparador productos
+□ App móvil
+
+════════════════════════════════════════════════════════════════════════
+📞 SI NECESITAS MÁS INFO
+════════════════════════════════════════════════════════════════════════
+
+1. Lee DOCUMENTACION_PROYECTO.txt (completo, 400+ líneas)
+2. Revisa comentarios en auth.js
+3. Inspecciona consola navegador (F12)
+4. Verifica localStorage en DevTools
+5. Prueba comandos de debugging listados arriba
+
+════════════════════════════════════════════════════════════════════════
+Última actualización: 2025-11-12
+Estado: ✅ PRODUCCIÓN - Todo funcional
+════════════════════════════════════════════════════════════════════════

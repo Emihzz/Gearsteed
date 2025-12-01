@@ -1,0 +1,401 @@
+================================================================================
+DOCUMENTACIÓN TÉCNICA DEL PROYECTO - GEARSTEED
+REFERENCIA PARA ASISTENTE IA - QUÉ HACE CADA ARCHIVO Y CÓMO USARLO
+================================================================================
+
+FECHA DE ÚLTIMA ACTUALIZACIÓN: 12 de Noviembre, 2025
+
+⚠️ ESTE DOCUMENTO ES PARA REFERENCIA DEL ASISTENTE IA ⚠️
+Contiene información técnica detallada sobre qué hace cada archivo,
+qué funciones contiene, cómo están conectados y qué NO se debe modificar.
+
+================================================================================
+ÍNDICE RÁPIDO
+================================================================================
+1. Resumen del Proyecto (QUÉ ES)
+2. Mapa de Archivos (QUÉ HACE CADA UNO)
+3. auth.js - Funciones y Uso
+4. Páginas HTML - Dependencias y Modificaciones
+5. Reglas Críticas (NO TOCAR)
+6. Problemas Conocidos y Soluciones
+7. Cómo Agregar Nuevas Funcionalidades
+8. Debugging y Troubleshooting
+
+================================================================================
+1. RESUMEN DEL PROYECTO (QUÉ ES)
+================================================================================
+
+GEARSTEED = Concesionaria de autos + Venta de refacciones online
+
+REGLA DE ORO:
+❌ VEHÍCULOS = SOLO VER (no se pueden comprar, solo cotizar)
+✅ REFACCIONES = SE PUEDEN COMPRAR (agregar al carrito y pagar)
+
+Usuario puede:
+- Navegar por vehículos (ver stock, cotizar)
+- COMPRAR refacciones (historia.html)
+- Registrarse / Login
+- Agregar refacciones al carrito
+- Aplicar cupones
+- Ver resumen y proceder al pago (requiere login)
+
+================================================================================
+2. MAPA DE ARCHIVOS (QUÉ HACE CADA UNO Y CUÁNDO MODIFICARLO)
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ARCHIVOS CORE (TOCAR CON CUIDADO)                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+
+📄 auth.js (503 líneas)
+   QUÉ HACE:
+   - Gestión de login/registro/logout
+   - TODAS las funciones del carrito de compras
+   - Almacenamiento en localStorage
+   - Validaciones de usuario
+   - Notificaciones y UI del carrito
+   
+   FUNCIONES PRINCIPALES:
+   • register(email, password, firstName, lastName)
+   • login(email, password, rememberMe) 
+   • logout()
+   • isAuthenticated()
+   • getCurrentUser()
+   • addToCart(product) ← NORMALIZA datos español→inglés
+   • getCart() ← Retorna array de productos
+   • updateCartQuantity(indexOrId, cantidad) ← Acepta índice O id
+   • removeFromCart(indexOrId) ← Acepta índice O id
+   • clearCart()
+   • getCartTotal() ← Compatible español/inglés
+   • getCartItemCount() ← Compatible español/inglés
+   • updateCartUI() ← Actualiza contador del header
+   • showCartNotification(message)
+   
+   CUÁNDO MODIFICAR:
+   - Si necesitas cambiar lógica del carrito
+   - Si agregas nuevas validaciones de usuario
+   - Si cambias formato de almacenamiento
+   
+   ⚠️ NO MODIFICAR:
+   - Estructura de normalización de productos (líneas 214-246)
+   - Compatibilidad español/inglés en getCartTotal y getCartItemCount
+   - Nombres de keys de localStorage: 'cart', 'gearsteed_user', etc.
+
+📄 styles.css
+   QUÉ HACE:
+   - Estilos generales del sitio
+   - Layout del header, footer, navegación
+   - Estilos de botones base
+   - Grid y flex layouts
+   
+   CUÁNDO MODIFICAR:
+   - Cambios de diseño general
+   - Colores de marca
+   - Tipografía base
+   
+   ⚠️ CONFLICTO CONOCIDO:
+   - Puede ocultar botones de "Agregar al Carrito" en historia.html
+   - Solución: usar !important en estilos inline de historia.html
+
+📄 auth-styles.css
+   QUÉ HACE:
+   - Estilos SOLO para sistema de autenticación
+   - Estilos del icono de carrito y contador
+   - Estilos del menú de usuario
+   - Modal de notificaciones del carrito
+   
+   CUÁNDO MODIFICAR:
+   - Cambiar diseño del carrito en header
+   - Modificar notificaciones
+   - Ajustar menú de usuario
+   
+   ⚠️ NO TOCAR:
+   - Clases .cart-icon, .cart-count (usadas en todas las páginas)
+   - Clases .user-icon, .user-menu (menú de usuario)
+
+📄 script.js
+   QUÉ HACE:
+   - Scripts generales del sitio
+   - Animaciones
+   - Interacciones base
+   
+   ⚠️ PROBLEMA CONOCIDO:
+   - Puede sobrescribir contenido de historia.html
+   - Solución: MutationObserver en historia.html protege el catálogo
+   
+   CUÁNDO MODIFICAR:
+   - Agregar animaciones generales
+   - Funcionalidades que afectan todo el sitio
+   
+   ⚠️ CUIDADO:
+   - NO hacer manipulación DOM en historia.html desde aquí
+   - Verificar que no entre en conflicto con auth.js
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PÁGINAS HTML - ESTRUCTURA Y DEPENDENCIAS                                │
+└─────────────────────────────────────────────────────────────────────────┘
+
+📄 index.html
+   QUÉ HACE: Página de inicio
+   SCRIPTS: script.js, auth.js (defer)
+   ESTILOS: styles.css, auth-styles.css
+   HEADER: ✅ Con carrito y usuario
+   MODIFICAR: Contenido de bienvenida, banners, secciones principales
+
+📄 vehiculos.html  
+   QUÉ HACE: Muestra catálogo de VEHÍCULOS (NO COMPRABLES)
+   SCRIPTS: script.js, auth.js (defer)
+   ESTILOS: styles.css, auth-styles.css
+   HEADER: ✅ Con carrito y usuario
+   
+   IMPORTANTE:
+   ❌ NO agregar botones de "Agregar al Carrito"
+   ✅ Solo mostrar: imagen, nombre, precio, stock, "Ver Detalles y Cotizar"
+   
+   BADGES DE STOCK:
+   - "Disponible en Stock" (verde)
+   - "Pocas Unidades" (amarillo)
+   
+   MODIFICAR: Para agregar/quitar vehículos, cambiar precios, actualizar stock
+
+📄 historia.html ⭐ IMPORTANTE
+   QUÉ HACE: Catálogo de REFACCIONES (PRODUCTOS COMPRABLES)
+   SCRIPTS: script.js, auth.js (defer)
+   ESTILOS: styles.css, auth-styles.css
+   HEADER: ✅ Con carrito y usuario
+   
+   PRODUCTOS ACTUALES (9):
+   1. Amortiguador Monroe - $1,299.99 - AM-001
+   2. Bomba de Combustible - $2,499.99 - BC-002
+   3. Filtro de Aceite Premium - $189.99 - FO-003
+   4. Kit de Clutch LuK - $3,899.99 - KC-004
+   5. Pastillas de Freno Brembo - $899.99 - PF-005
+   6. Bujías de Iridio - $699.99 - BI-006
+   7. Discos de Freno Ventilados - $1,599.99 - DF-007
+   8. Batería 12V 60Ah - $1,899.99 - BT-008
+   9. Radiador de Aluminio - $2,199.99 - RA-009
+   
+   ESTRUCTURA DE CADA PRODUCTO:
+   ```html
+   <div class="product-card">
+       <img src="img/placeholder.jpg" alt="Nombre">
+       <h3>Nombre del Producto</h3>
+       <p class="price">$X,XXX.XX</p>
+       <p class="sku">SKU: XX-XXX</p>
+       <button onclick="addRefaccionToCart('Nombre', XXXX.XX, 'SKU-XXX')" 
+               style="background: linear-gradient(135deg, #ff6b35 0%, #ff8c61 100%) !important; 
+                      display: block !important; 
+                      visibility: visible !important;">
+           <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+       </button>
+   </div>
+   ```
+   
+   FUNCIÓN EN HISTORIA.HTML (línea 752):
+   ```javascript
+   function addRefaccionToCart(name, price, sku) {
+       addToCart({  // ← Llama a función de auth.js
+           id: sku,
+           name: name,
+           price: price,
+           sku: sku,
+           image: 'img/placeholder.jpg',
+           quantity: 1
+       });
+       // Feedback visual del botón (cambia a verde con check)
+   }
+   ```
+   
+   ⚠️ PROTECCIÓN DOM (línea ~780):
+   MutationObserver evita que script.js sobrescriba el catálogo
+   ```javascript
+   const observer = new MutationObserver(function(mutations) {
+       // Si script.js modifica el DOM, lo restauramos
+   });
+   ```
+   
+   MODIFICAR CUANDO:
+   - Agregar nuevos productos
+   - Cambiar precios
+   - Actualizar imágenes
+   - Modificar SKUs
+   
+   ⚠️ AL AGREGAR PRODUCTO:
+   1. Mantener !important en estilos del botón
+   2. Usar onclick="addRefaccionToCart('Nombre', Precio, 'SKU')"
+   3. NO usar comillas dobles dentro del onclick
+   4. Precio sin símbolo $ ni comas (usar punto decimal)
+   
+   ⚠️ NO TOCAR:
+   - MutationObserver (líneas 780+)
+   - Función addRefaccionToCart
+   - Estilos !important de los botones
+
+📄 carrito.html ⭐ IMPORTANTE
+   QUÉ HACE: Página del carrito de compras completo
+   SCRIPTS: auth.js (SIN defer), luego script inline
+   ESTILOS: styles.css, auth-styles.css
+   HEADER: ✅ Con carrito y usuario
+   
+   ⚠️ CRÍTICO: auth.js se carga SIN defer aquí
+   <script src="auth.js"></script>  ← Sin defer para carga síncrona
+   
+   SECCIONES:
+   1. Estado vacío (id="emptyCart") - Mostrar si cart.length === 0
+   2. Contenido del carrito (id="cartContent") - Grid de productos
+   3. Resumen (subtotal, envío, IVA, total)
+   4. Sistema de cupones
+   5. Botones: Vaciar Carrito, Aplicar Cupón, Proceder al Pago
+   
+   FUNCIONES PRINCIPALES (en script inline):
+   
+   • migrateOldCartData() [línea ~672]
+     - Convierte datos viejos español→inglés
+     - Se ejecuta ANTES de renderizar
+     - NO TOCAR, crítica para compatibilidad
+   
+   • initCartPage() [línea ~720]
+     - Inicializa la página
+     - Verifica que getCart esté disponible
+     - Llama renderCartPage() y setupEventListeners()
+   
+   • renderCartPage() [línea ~735]
+     - Obtiene cart con getCart()
+     - Decide mostrar empty o content
+     - Llama renderCartItems() y updateCartSummary()
+   
+   • renderCartItems(cart) [línea ~750]
+     - Genera HTML de cada producto
+     - Botones de cantidad (+/-, input)
+     - Botón de eliminar producto
+   
+   • updateCartSummary(cart) [línea ~820]
+     - Calcula subtotal (suma de price * quantity)
+     - Envío: $200.00 fijo
+     - IVA: 16% del subtotal
+     - Aplica descuento si hay cupón
+     - Actualiza DOM con totales
+   
+   • setupEventListeners() [línea ~840]
+     - Vaciar Carrito (clearCartBtn)
+     - Aplicar Cupón (applyCouponBtn)
+     - Proceder al Pago (checkoutBtn) - requiere login
+   
+   • decreaseQuantity(index), increaseQuantity(index) [línea ~880]
+     - Usa updateCartQuantity(index, newQty) de auth.js
+     - Rango: 1-99
+   
+   • removeItem(index) [línea ~920]
+     - Confirmación con confirm()
+     - Usa removeFromCart(index) de auth.js
+   
+   • applyCoupon() [línea ~940]
+     - Valida código ingresado
+     - Cupones: DESCUENTO10 (10%), DESCUENTO20 (20%), GEARSTEED (15%)
+     - Actualiza appliedCoupon variable
+     - Re-calcula totales
+   
+   CUPONES VÁLIDOS:
+   {
+       'DESCUENTO10': { percentage: 10, description: '10% de descuento' },
+       'DESCUENTO20': { percentage: 20, description: '20% de descuento' },
+       'GEARSTEED': { percentage: 15, description: '15% de descuento especial' }
+   }
+   
+   IDs DE ELEMENTOS CRÍTICOS:
+   - emptyCart: div del estado vacío
+   - cartContent: div del contenido
+   - cartItemsContainer: donde se insertan productos
+   - clearCartBtn: botón vaciar carrito
+   - applyCouponBtn: botón aplicar cupón
+   - checkoutBtn: botón proceder al pago
+   - couponInput: input del código de cupón
+   - couponMessage: mensaje de validación cupón
+   - subtotalAmount, shippingAmount, taxAmount, totalAmount: spans de montos
+   
+   MODIFICAR CUANDO:
+   - Cambiar cupones disponibles
+   - Modificar cálculo de envío
+   - Cambiar tasa de IVA
+   - Ajustar diseño del carrito
+   
+   ⚠️ NO TOCAR:
+   - Orden de carga de scripts
+   - Función migrateOldCartData
+   - Llamadas a funciones de auth.js
+   - Validaciones de existencia de funciones
+
+📄 login.html
+   QUÉ HACE: Página de inicio de sesión
+   SCRIPTS: auth.js (defer)
+   ESTILOS: auth-styles.css
+   HEADER: ❌ No tiene (página standalone)
+   
+   FORMULARIO:
+   - Email (validación de formato)
+   - Password
+   - Checkbox "Recordarme" (usa sessionStorage vs localStorage)
+   - Link a recuperación de contraseña
+   - Link a registro
+   
+   FUNCIÓN AL SUBMIT:
+   Llama login(email, password, rememberMe) de auth.js
+   
+   REDIRECT:
+   Acepta parámetro ?redirect=pagina.html para redirigir después del login
+   Ejemplo: login.html?redirect=carrito.html
+   
+   MODIFICAR CUANDO:
+   - Cambiar diseño del formulario
+   - Agregar campos adicionales
+   - Modificar validaciones visuales
+
+📄 registro.html
+   QUÉ HACE: Página de registro de nuevos usuarios
+   SCRIPTS: auth.js (defer)
+   ESTILOS: auth-styles.css
+   HEADER: ❌ No tiene (página standalone)
+   
+   FORMULARIO:
+   - Nombre
+   - Apellido
+   - Email
+   - Contraseña (con indicador de fortaleza)
+   - Confirmar contraseña
+   - Link a login
+   
+   INDICADOR DE FORTALEZA:
+   - Débil (rojo): < 6 caracteres
+   - Media (amarillo): 6-8 caracteres
+   - Fuerte (verde): > 8 caracteres + mayúsculas/números
+   
+   FUNCIÓN AL SUBMIT:
+   Llama register(email, password, firstName, lastName) de auth.js
+   
+   VALIDACIONES:
+   - Email formato válido
+   - Contraseñas coincidentes
+   - Contraseña mínimo 6 caracteres
+   
+   MODIFICAR CUANDO:
+   - Cambiar requisitos de contraseña
+   - Agregar términos y condiciones
+   - Modificar diseño
+
+📄 nosotros.html, contactanos.html, ubicacion.html
+   QUÉ HACEN: Páginas informativas
+   SCRIPTS: script.js, auth.js (defer)
+   ESTILOS: styles.css, auth-styles.css
+   HEADER: ✅ Con carrito y usuario
+   
+   MODIFICAR: Contenido informativo sin afectar funcionalidad
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ CARPETAS Y ASSETS                                                       │
+└─────────────────────────────────────────────────────────────────────────┘
+
+📁 img/
+   - placeholder.jpg ← Imagen por defecto de productos
+   - Otras imágenes del sitio
+   
+   MODIFICAR: Agregar imágenes reales de productos aquí

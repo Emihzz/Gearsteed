@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GearSteed - Concesionaria Automotriz Premium</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="canonical" href="https://GearSteed.mx">
+
+    <script src="auth.js" defer></script>
+
+    <style>
+        /* [ESTILOS OMITIDOS POR BREVEDAD] */
+        :root {
+            --bg-body: #03040a;        /* fondo general más oscuro */
+            --bg-section: #080912;     /* secciones ligeramente más oscuras */
+            --bg-card: #0b1118;        /* tarjetas más profundas */
+            --accent: #1e40af;         /* acento más oscuro (azul profundo) */
+            --accent-hover: #17337a;   /* hover del acento también más oscuro */
+            --text-main: #ffffff;      /* texto principal sin cambios */
+            --text-secondary: #94a3b8; /* texto secundario sin cambios */
+            --border-subtle: rgba(255,255,255,0.04); /* bordes más sutiles */
+            --success: #0ea163;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        .header {
+            padding: 20px 0;
+            background: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 30px; }
+
+        .header .container { display: flex; align-items: center; justify-content: space-between; }
+        .logo-img { height: 45px; width: auto; }
+
+        .nav-list { display: flex; gap: 40px; list-style: none; margin: 0; padding: 0; }
+        .nav-link {
+            color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.95rem;
+            transition: color 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--text-main); }
+
+        .header-actions { display: flex; gap: 20px; align-items: center; }
+
+        .cart-btn, .login-btn {
+            color: var(--text-main); text-decoration: none; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+            border: 1px solid var(--border-subtle); border-radius: 6px; transition: 0.3s;
+        }
+        .cart-btn:hover, .login-btn:hover { border-color: var(--accent); background: rgba(59, 130, 246, 0.1); }
+        .hamburger { display: none; cursor: pointer; color: white; font-size: 1.5rem; }
+
+        @media (max-width: 992px) {
+            .nav { display: none; }
+            .hamburger { display: block; }
+        }
+
+        /* HERO SECTION */
+        .hero {
+            position: relative;
+            padding: 100px 0 140px;
+            background: radial-gradient(circle at 50% 30%, #172033 0%, var(--bg-body) 70%);
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-block; background: rgba(59, 130, 246, 0.1);
+            color: var(--accent); padding: 8px 20px; border-radius: 30px;
+            font-size: 0.85rem; font-weight: 600; margin-bottom: 30px; letter-spacing: 1px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .hero-title {
+            font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 25px; letter-spacing: -1px;
+        }
+        .hero-title span {
+            background: linear-gradient(to right, #fff 40%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .highlight { color: var(--accent); -webkit-text-fill-color: var(--accent) !important; }
+
+        .hero-description {
+            font-size: 1.3rem; color: var(--text-secondary); margin: 0 auto 50px; font-weight: 300; line-height: 1.6; max-width: 700px;
+        }
+
+        .hero-buttons { display: flex; gap: 20px; justify-content: center; margin-bottom: 80px; }
+
+        .btn-primary {
+            background: var(--accent); color: white; padding: 16px 40px;
+            border-radius: 8px; text-decoration: none; font-weight: 600; border: none; font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.25);
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4); }
+
+        .btn-secondary {
+            background: transparent; color: white; padding: 16px 40px;
+            border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1rem;
+            border: 1px solid var(--border-subtle); transition: 0.3s;
+        }
+        .btn-secondary:hover { border-color: var(--text-main); background: rgba(255,255,255,0.05); }
+
+        /* ESTADÍSTICAS */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 40px 0;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            text-align: center;
+            border-right: 1px solid var(--border-subtle);
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-num {
+            display: block;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .stat-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+                border: none;
+                background: transparent;
+            }
+            .stat-item { border: none; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px; }
+        }
+
+        /* SECCIONES GENERALES */
+        section { padding: 100px 0; }
+        .section-header { text-align: center; margin-bottom: 70px; }
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 15px; color: #4c6edf; }
+        .section-header p {
+            color: #d7d8e6;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* GRID DE VEHÍCULOS */
+        .enhanced-filters { margin-bottom: 50px; text-align: center; }
+        .filter-container { display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); color: var(--text-secondary);
+            padding: 10px 24px; border-radius: 50px; cursor: pointer; transition: 0.3s;
+            font-size: 0.95rem; display: flex; align-items: center; gap: 8px;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--text-main); color: var(--bg-body); border-color: var(--text-main);
+        }
+
+        .vehicle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+        .hidden-card { display: none !important; }
+
+        .vehicle-card {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: 16px; overflow: hidden; transition: transform 0.3s ease;
+            display: flex; flex-direction: column;
+        }
+        .vehicle-card:hover { transform: translateY(-8px); border-color: var(--accent); }
+
+        .card-image { height: 240px; overflow: hidden; position: relative; background: #1f2937; }
+        .card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .vehicle-card:hover .card-image img { transform: scale(1.05); }
+
+        .badge {
+            position: absolute; top: 15px; left: 15px; padding: 5px 12px;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); color: #fff;
+            border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;
+        }
+        .badge.new { background: var(--accent); }
+
+        .card-content { padding: 25px; flex: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.25rem; font-weight: 700; margin: 0 0 10px 0; color: #fff; }
+        .card-price { font-size: 1.5rem; color: var(--accent); font-weight: 700; margin-bottom: 20px; }
+
+        .specs-row {
+            display: flex; justify-content: space-between; margin-bottom: 25px;
+            padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.9rem; color: var(--text-secondary);
+        }
+        .card-btn {
+            margin-top: auto; width: 100%; padding: 12px; text-align: center;
+            background: transparent; border: 1px solid var(--border-subtle); color: #fff;
+            border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.3s;
+        }
+        .card-btn:hover { background: var(--text-main); color: var(--bg-body); }
+
+        /* SERVICIOS */
+        .services-section { background: var(--bg-section); }
+        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+        .service-item {
+            background: var(--bg-card); padding: 40px 25px; border-radius: 12px;
+            text-align: center; border: 1px solid var(--border-subtle); transition: 0.3s;
+        }
+        .service-item:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .service-icon {
+            font-size: 2rem; color: var(--accent); margin-bottom: 20px;
+            height: 70px; width: 70px; background: rgba(59, 130, 246, 0.1);
+            border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .service-item h3 { font-size: 1.2rem; color: #604ff7; margin-bottom: 10px; }
+        .service-item p {
+            font-size: 0.95rem;
+            color: #cbd5e1; /* Cambiado a un gris más claro */
+        }
+
+        /* FOOTER */
+        .footer { padding: 80px 0 30px; background: #000; border-top: 1px solid var(--border-subtle); font-size: 0.95rem; }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 50px; margin-bottom: 50px; }
+        .footer h4 { color: #fff; margin-bottom: 20px; font-size: 1.1rem; }
+        .footer ul { list-style: none; padding: 0; }
+        .footer li { margin-bottom: 12px; }
+        .footer a { color: var(--text-secondary); text-decoration: none; transition: 0.3s; }
+        .footer a:hover { color: var(--accent); }
+        .socials { display: flex; gap: 15px; margin-top: 20px; }
+        .footer-bottom { text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 30px; color: #555; font-size: 0.9rem; }
+
+        @media (max-width: 1024px) { .vehicle-grid { grid-template-columns: repeat(2, 1fr); } .services-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) { .vehicle-grid, .services-grid, .footer-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 0; font-size: 0.85rem; color: var(--text-secondary); background: #020202;">
+    <div class="container" style="display: flex; justify-content: space-between;">
+        <div><i class="fas fa-phone" style="margin-right: 5px; color: var(--accent);"></i> +52 967 133 0637</div>
+        <div><i class="fas fa-clock" style="margin-right: 5px; color: var(--accent);"></i> Lun - Sab: 9:00 AM - 7:00 PM</div>
+    </div>
+</div>
+
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <img src="img/5bc10d75-fa44-476c-a17c-a45052863030.png" alt="Gear Steed" class="logo-img">
+        </div>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                <li><a href="index.html" class="nav-link active">Inicio</a></li>
+                <li><a href="vehiculos.html" class="nav-link">Inventario</a></li>
+                <li><a href="historia.html" class="nav-link">Refaccionaria</a></li>
+                <li><a href="nosotros.html" class="nav-link">Nosotros</a></li>
+                <li><a href="contactanos.html" class="nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <div class="user-cart-section" style="display: flex; gap: 15px;">
+                <a href="carrito.html" class="cart-btn">
+                    <i class="fas fa-shopping-cart"></i> <span>Carrito</span>
+                </a>
+
+                <div id="user-menu">
+                    <a href="login.html" class="login-btn">
+                        <i class="fas fa-user"></i> <span>Ingresar</span>
+                    </a>
+                </div>
+
+            </div>
+            <div class="hamburger"><i class="fas fa-bars"></i></div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <span class="hero-badge">Concesionaria Premium #1</span>
+                <h1 class="hero-title">
+                    Encuentra el Vehículo<br>
+                    <span class="highlight">Perfecto para Ti</span>
+                </h1>
+                <p class="hero-description">
+                    Especialistas en vehículos de alta gama, deportivos y 4x4. Más de 15 años brindando confianza, seguridad y el mejor servicio post-venta del mercado.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="vehiculos.html" class="btn-primary">Ver Inventario</a>
+                    <a href="contactanos.html" class="btn-secondary">Agendar Cita</a>
+                </div>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-num">350+</span>
+                    <span class="stat-desc">Vehículos Disponibles</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">15</span>
+                    <span class="stat-desc">Años de Trayectoria</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">5k+</span>
+                    <span class="stat-desc">Clientes Felices</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num">100%</span>
+                    <span class="stat-desc">Garantía Certificada</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="vehiculos">
+        <div class="container">
+            <div class="section-header">
+                <h2>Vehículos Destacados</h2>
+                <p>Nuestra selección exclusiva de unidades listas para entrega inmediata.</p>
+            </div>
+
+            <div class="enhanced-filters">
+                <div class="filter-container">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="nuevo"><i class="fas fa-star"></i> Nuevos</button>
+                    <button class="filter-btn" data-filter="usado"><i class="fas fa-certificate"></i> Seminuevos</button>
+                    <button class="filter-btn" data-filter="suv"><i class="fas fa-truck"></i> SUV/Pickup</button>
+                    <button class="filter-btn" data-filter="sedan"><i class="fas fa-car"></i> Sedanes</button>
+                    <button class="filter-btn" data-filter="deportivo"><i class="fas fa-tachometer-alt"></i> Deportivos</button>
+                </div>
+            </div>
+
+            <div class="vehicle-grid">
+
+                <div class="vehicle-card" data-category="suv nuevo pickup">
+                    <div class="card-image">
+                        <img src="img/Ford%20F-150%20Raptor.png" alt="Ford Raptor">
+                        <span class="badge new">Nuevo</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Ford F-150 Raptor 2024</h3>
+                        <div class="card-price">$1,105,000.00 MXN</div>
+                        <div class="specs-row">
+                            <span><i class="fas fa-calendar"></i> 2024</span>
+                            <span><i class="fas fa-road"></i> 0 km</span>
+                            <span><i class="fas fa-gas-pump"></i> Gasolina</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vehicle-card" data-category="deportivo usado">
+                    <div class="card-image">
+                        <img src="img/Dodge%20Challenger%20RT.png" alt="Dodge Challenger">
+                        <span class="badge">Seminuevo</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Dodge Challenger R/T</h3>
+                        <div class="card-price">$729,300.00 MXN</div>
+                        <div class="specs-row">
+                            <span><i class="fas fa-calendar"></i> 2023</span>
+                            <span><i class="fas fa-road"></i> 18k km</span>
+                            <span><i class="fas fa-gas-pump"></i> Gasolina</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vehicle-card" data-category="sedan nuevo">
+                    <div class="card-image">
+                        <img src="img/Toyota%20Camry%20Hybrid.png" alt="Toyota Camry">
+                        <span class="badge new">Nuevo</span>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Toyota Camry Hybrid</h3>
+                        <div class="card-price">$552,500.00 MXN</div>
+                        <div class="specs-row">
+                            <span><i class="fas fa-calendar"></i> 2024</span>
+                            <span><i class="fas fa-road"></i> 0 km</span>
+                            <span><i class="fas fa-bolt"></i> Híbrido</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="services-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nuestros Servicios</h2>
+                <p>Soluciones integrales para mantener tu vehículo en perfectas condiciones.</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-car"></i></div>
+                    <h3>Venta de Vehículos</h3>
+                    <p>Catálogo exclusivo de unidades nuevas y seminuevas certificadas.</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-tools"></i></div>
+                    <h3>Taller & Refacciones</h3>
+                    <p>Mantenimiento especializado y piezas originales garantizadas.</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-handshake"></i></div>
+                    <h3>Compra Segura</h3>
+                    <p>Evaluamos tu auto actual y te ofrecemos el mejor precio del mercado.</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-credit-card"></i></div>
+                    <h3>Financiamiento</h3>
+                    <p>Planes de crédito flexibles adaptados a tu presupuesto.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #fff; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-shield-alt" style="color: var(--accent);"></i> GearSteed
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    Tu concesionaria de confianza. Calidad, seguridad y transparencia en cada kilómetro.
+                </p>
+                <div class="socials">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h4>Explorar</h4>
+                <ul>
+                    <li><a href="vehiculos.html">Inventario</a></li>
+                    <li><a href="historia.html">Refaccionaria</a></li>
+                    <li><a href="nosotros.html">Nosotros</a></li>
+                    <li><a href="contactanos.html">Contacto</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4>Servicios</h4>
+                <ul>
+                    <li><a href="#">Venta de Autos</a></li>
+                    <li><a href="#">Compra de Autos</a></li>
+                    <li><a href="#">Servicio Técnico</a></li>
+                    <li><a href="#">Créditos</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4>Contacto</h4>
+                <ul>
+                    <li style="color: var(--text-secondary);"><i class="fas fa-map-marker-alt" style="color: var(--accent); width: 20px;"></i> Av. Revolución 1847</li>
+                    <li style="color: var(--text-secondary);"><i class="fas fa-phone" style="color: var(--accent); width: 20px;"></i> +52 967 133 0637</li>
+                    <li style="color: var(--text-secondary);"><i class="fas fa-envelope" style="color: var(--accent); width: 20px;"></i> ventas@GearSteed.mx</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 GearSteed. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+    // 1. FUNCIÓN DE LOGOUT ROBUSTA CONECTADA AL PHP
+    // Usamos un nombre único (cerrarSesionPHP) para no chocar con auth.js
+    window.cerrarSesionPHP = async function() {
+        const datos = new URLSearchParams();
+        datos.append('action', 'logout');
+
+        try {
+            const response = await fetch('api_gearsteed.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: datos
+            });
+            const result = await response.json();
+
+            if(result.success) {
+                // Si el PHP dice que se cerró, recargamos la página
+                window.location.reload();
+            } else {
+                console.error("Error en logout PHP:", result.message);
+                // Forzamos recarga de todos modos por seguridad
+                window.location.reload();
+            }
+        } catch (e) {
+            console.error("Error de red al cerrar sesión:", e);
+            alert("Error de conexión. Intente recargar la página.");
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        // 2. VERIFICACIÓN DE SESIÓN AL CARGAR LA PÁGINA
+        const menuContainer = document.getElementById('user-menu');
+        const datos = new URLSearchParams();
+        datos.append('action', 'check_session');
+
+        try {
+            const response = await fetch('api_gearsteed.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: datos
+            });
+
+            // Verificamos si la respuesta es válida JSON
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+            const result = await response.json();
+
+            // Si el usuario está logueado en PHP
+            if (result.success && result.logged_in) {
+                const nombreCompleto = result.user_name || "Usuario";
+                const nombreCorto = nombreCompleto.split(' ')[0]; // Tomar solo el primer nombre
+
+                // Inyectamos el HTML del usuario logueado
+                // IMPORTANTE: El botón de salir llama a cerrarSesionPHP()
+                menuContainer.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;">
+                            <span style="color:var(--text-secondary); font-size:0.75rem;">Bienvenido</span>
+                            <span style="color:white; font-weight:600; font-size: 0.95rem;">${nombreCorto}</span>
+                        </div>
+                        <button onclick="cerrarSesionPHP()"
+                                style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid #ef4444;
+                                       padding:8px 12px; border-radius:8px; cursor:pointer; font-size:0.85rem;
+                                       transition: 0.3s; display:flex; align-items:center; gap:5px;">
+                            <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+                        </button>
+                    </div>
+                `;
+            }
+            // Si NO está logueado, dejamos el botón "Ingresar" que ya está en el HTML por defecto.
+        } catch (e) {
+            console.log("Visitante no logueado o error de conexión al verificar sesión:", e);
+        }
+
+        // 3. Lógica de Filtros de Vehículos (Se mantiene igual)
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.vehicle-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.getAttribute('data-filter');
+
+                cards.forEach(card => {
+                    const cat = card.getAttribute('data-category');
+                    if (filter === 'all' || cat.includes(filter)) {
+                        card.classList.remove('hidden-card');
+                    } else {
+                        card.classList.add('hidden-card');
+                    }
+                });
+            });
+        });
+    });
+</script>
+</body>
+</html>

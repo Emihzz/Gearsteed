@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventario Premium - GearSteed</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <script src="auth.js" defer></script>
+
+    <style>
+        /* [ESTILOS OMITIDOS POR BREVEDAD] */
+        :root {
+            --bg-body: #00010a;        /* fondo general: más oscuro, casi negro */
+            --bg-section: #040511;     /* secciones ligeramente más oscuras */
+            --bg-card: #051019;        /* tarjetas aún más profundas */
+            --accent: #17254f;         /* acento más oscuro y sobrio */
+            --accent-hover: #0f1936;   /* hover del acento también más oscuro */
+            --text-main: #ffffff;      /* texto principal sin cambios */
+            --text-secondary: #94a3b8; /* texto secundario sin cambios */
+            --border-subtle: rgba(255,255,255,0.03); /* bordes aún más sutiles */
+            --success: #0ea163;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* HEADER */
+        .header {
+            padding: 20px 0;
+            background: rgba(5, 5, 5, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 30px; }
+        .header .container { display: flex; align-items: center; justify-content: space-between; }
+        .logo-img { height: 45px; width: auto; }
+
+        .nav-list { display: flex; gap: 30px; list-style: none; margin: 0; padding: 0; }
+        .nav-link {
+            color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 0.95rem;
+            transition: color 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--text-main); }
+
+        .header-actions { display: flex; gap: 20px; align-items: center; }
+        .cart-btn, .login-btn {
+            color: var(--text-main); text-decoration: none; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+            border: 1px solid var(--border-subtle); border-radius: 6px; transition: 0.3s;
+        }
+        .cart-btn:hover, .login-btn:hover { border-color: var(--accent); background: rgba(59, 130, 246, 0.1); }
+        .hamburger { display: none; cursor: pointer; color: white; font-size: 1.5rem; }
+
+        @media (max-width: 992px) {
+            .nav { display: none; }
+            .hamburger { display: block; }
+        }
+
+        /* HERO SECTION */
+        .vehicle-hero {
+            padding: 60px 0;
+            background: radial-gradient(circle at 50% 30%, #172033 0%, var(--bg-body) 70%);
+            text-align: center;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .hero-title { font-size: 3rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+        .hero-subtitle { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 30px; }
+
+        .hero-stats { display: flex; justify-content: center; gap: 60px; margin-top: 20px; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-number { font-size: 2rem; font-weight: 700; color: var(--text-main); line-height: 1; }
+        .stat-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+        /* SECCIÓN ARSENAL */
+        .arsenal { padding: 30px 0; border-bottom: 1px solid var(--border-subtle); background: var(--bg-section); }
+        .arsenal-stats { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .arsenal-stat {
+            background: var(--bg-card); padding: 10px 25px; border-radius: 50px;
+            border: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px;
+            color: var(--text-secondary); font-size: 0.9rem;
+        }
+        .arsenal-stat i { color: var(--accent); }
+
+        /* =========================================
+           CONTROLES Y FILTROS (HORIZONTAL FIX)
+           ========================================= */
+        .enhanced-filters {
+            margin: 40px 0;
+            display: flex;
+            justify-content: space-between; /* Clave: Separa izquierda y derecha */
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .filter-categories { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); color: var(--text-secondary);
+            padding: 8px 18px; border-radius: 6px; cursor: pointer; transition: 0.3s;
+            font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--text-main); color: var(--bg-body) !important; border-color: var(--text-main);
+        }
+        .filter-btn i, .filter-btn span { color: inherit !important; }
+
+        .filter-options { display: flex; gap: 10px; align-items: center; }
+
+        .filter-select {
+            background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle);
+            padding: 8px 15px; border-radius: 6px; outline: none; cursor: pointer; font-size: 0.9rem;
+        }
+
+        .view-toggle {
+            background: transparent; border: 1px solid var(--border-subtle); color: var(--text-secondary);
+            width: 36px; height: 36px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .view-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* GRID DE VEHÍCULOS */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+        .hidden-card { display: none !important; }
+
+        .vehicle-detail-card {
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            border-radius: 16px; overflow: hidden; transition: transform 0.3s ease, border-color 0.3s;
+            display: flex; flex-direction: column; position: relative;
+        }
+        .vehicle-detail-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+
+        .vehicle-image-detail { height: 220px; overflow: hidden; position: relative; background: #1f2937; }
+        .vehicle-image-detail img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .vehicle-detail-card:hover .vehicle-image-detail img { transform: scale(1.05); }
+
+        /* =========================================
+           ETIQUETA DE ESTADO (COPIADO DE INDEX.HTML)
+           ========================================= */
+        .badge {
+            position: absolute; top: 15px; left: 15px; padding: 5px 12px;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); color: #fff;
+            border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;
+            z-index: 2;
+        }
+        .badge.new { background: var(--accent); }
+
+        .vehicle-rating { position: absolute; bottom: 10px; right: 15px; color: #fbbf24; font-size: 0.8rem; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+
+        .vehicle-detail-info { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .vehicle-detail-info h3 { font-size: 1.15rem; font-weight: 700; margin: 0 0 8px 0; color: #fff; }
+
+        .vehicle-price-detail { font-size: 1.4rem; color: var(--accent); font-weight: 700; margin-bottom: 12px; }
+
+        .stock-indicator {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255, 255, 255, 0.03); padding: 3px 8px; border-radius: 4px;
+            font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 15px; width: fit-content;
+        }
+        .stock-indicator span { color: #fff; font-weight: 600; }
+        .stock-indicator i { color: var(--accent); font-size: 0.8rem; }
+
+        .vehicle-specs {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-subtle);
+        }
+        .spec-item { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-secondary); }
+        .spec-item i { color: var(--accent); width: 14px; }
+        .spec-item span { color: #ccc; }
+
+        .vehicle-features { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+        .feature-tag {
+            background: rgba(59, 130, 246, 0.1); color: var(--accent);
+            padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;
+        }
+
+        .btn-full {
+            width: 100%; text-align: center; padding: 10px; margin-top: auto;
+            background: transparent; border: 1px solid var(--border-subtle); color: #fff;
+            border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 0.9rem;
+        }
+        .btn-full:hover { background: var(--text-main); color: var(--bg-body); }
+
+        /* COMPARADOR */
+        .vehicle-comparison { padding: 50px 0; background: var(--bg-section); border-top: 1px solid var(--border-subtle); }
+        .vehicle-comparison h2 { text-align: center; color: #fff; margin-bottom: 10px; }
+        .vehicle-comparison p { text-align: center; color: var(--text-secondary); margin-bottom: 30px; }
+
+        .comparison-table {
+            min-height: 140px;
+            border: 2px dashed var(--border-subtle);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+            display: flex; gap: 20px; align-items: center; justify-content: center;
+            padding: 20px; transition: 0.3s;
+        }
+        .comparison-placeholder { text-align: center; color: var(--text-secondary); }
+        .comparison-placeholder i { font-size: 1.8rem; margin-bottom: 10px; color: var(--accent); opacity: 0.5; }
+
+        .comparison-card {
+            background: var(--bg-card); padding: 12px; border-radius: 10px; border: 1px solid var(--border-subtle);
+            width: 240px; position: relative;
+        }
+        .comparison-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; }
+        .comparison-card h3 { font-size: 0.95rem; color: #fff; margin-bottom: 5px; }
+        .comparison-card .btn-outline {
+            background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 5px; font-size: 0.8rem;
+            border-radius: 4px; cursor: pointer; transition: 0.2s;
+        }
+        .comparison-card .btn-outline:hover { background: #ef4444; color: white; }
+
+        /* FOOTER */
+        .footer { padding: 60px 0 20px; background: #000; border-top: 1px solid var(--border-subtle); font-size: 0.9rem; }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .footer h4 { color: #fff; margin-bottom: 20px; font-size: 1rem; }
+        .footer ul { list-style: none; padding: 0; }
+        .footer li { margin-bottom: 10px; }
+        .footer a { color: var(--text-secondary); text-decoration: none; transition: 0.3s; }
+        .footer a:hover { color: var(--accent); }
+        .socials { display: flex; gap: 15px; margin-top: 20px; }
+        .footer-bottom { text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 20px; color: #555; font-size: 0.85rem; }
+
+        @media (max-width: 1024px) {
+            .catalog-grid { grid-template-columns: repeat(2, 1fr); }
+            .enhanced-filters { flex-direction: column; align-items: stretch; gap: 15px; } /* En móvil se apilan */
+            .filter-categories { justify-content: center; }
+            .filter-options { justify-content: center; }
+        }
+        @media (max-width: 768px) {
+            .catalog-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .header-actions .login-btn span, .header-actions .cart-btn span { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <img src="img/5bc10d75-fa44-476c-a17c-a45052863030.png" alt="Gear Steed" class="logo-img">
+        </div>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                <li><a href="index.html" class="nav-link">Inicio</a></li>
+                <li><a href="vehiculos.html" class="nav-link active">Inventario</a></li>
+                <li><a href="historia.html" class="nav-link">Refaccionaria</a></li>
+                <li><a href="nosotros.html" class="nav-link">Nosotros</a></li>
+                <li><a href="contactanos.html" class="nav-link">Contacto</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <div class="user-cart-section" id="cart-menu" style="display: flex; gap: 15px;">
+                <a href="carrito.html" class="cart-btn" title="Ver Carrito">
+                    <i class="fas fa-shopping-cart"></i> <span>Carrito</span>
+                    <span class="cart-count" style="display: none;">0</span>
+                </a>
+
+                <div class="user-auth-section" id="user-menu">
+                    <a href="login.html" class="login-btn" title="Iniciar Sesión">
+                        <i class="fas fa-user"></i> <span>Ingresar</span>
+                    </a>
+                </div>
+            </div>
+            <div class="hamburger"><i class="fas fa-bars"></i></div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="vehicle-hero">
+        <div class="container">
+            <span style="color: var(--accent); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; font-size: 0.85rem;">Stock Premium</span>
+            <h1 class="hero-title">Inventario Completo</h1>
+            <p class="hero-subtitle">Descubre la ingenieria y el poder que te mereces.</p>
+
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">200+</span>
+                    <span class="stat-label">Unidades</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">15</span>
+                    <span class="stat-label">Marcas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Garantizado</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="arsenal">
+        <div class="container">
+            <div class="arsenal-stats">
+                <div class="arsenal-stat">
+                    <i class="fas fa-car"></i>
+                    <span>Sedanes & Hatchbacks</span>
+                </div>
+                <div class="arsenal-stat">
+                    <i class="fas fa-truck"></i>
+                    <span>SUVs & 4x4</span>
+                </div>
+                <div class="arsenal-stat">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Deportivos High-End</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="vehicle-catalog">
+        <div class="container">
+            <div class="enhanced-filters">
+                <div class="filter-categories">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fas fa-th"></i> <span>Todos</span>
+                    </button>
+                    <button class="filter-btn" data-filter="nuevo">
+                        <i class="fas fa-star"></i> <span>Nuevos</span>
+                    </button>
+                    <button class="filter-btn" data-filter="usado">
+                        <i class="fas fa-certificate"></i> <span>Seminuevos</span>
+                    </button>
+                    <button class="filter-btn" data-filter="suv">
+                        <i class="fas fa-truck"></i> <span>SUV/Pickup</span>
+                    </button>
+                    <button class="filter-btn" data-filter="sedan">
+                        <i class="fas fa-car"></i> <span>Sedanes</span>
+                    </button>
+                    <button class="filter-btn" data-filter="deportivo">
+                        <i class="fas fa-tachometer-alt"></i> <span>Deportivos</span>
+                    </button>
+                </div>
+
+                <div class="filter-options">
+                    <select class="filter-select" id="sortBy">
+                        <option value="featured">Destacados</option>
+                        <option value="price-low">Menor Precio</option>
+                        <option value="price-high">Mayor Precio</option>
+                    </select>
+                    <button class="view-toggle" data-view="grid" title="Vista de cuadrícula">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button class="view-toggle" data-view="list" title="Vista de lista">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="catalog-grid" id="vehicleGrid">
+                <div class="vehicle-detail-card" data-category="suv nuevo pickup" draggable="true" data-id="ford-raptor">
+                    <div class="vehicle-image-detail">
+                        <img src="img/Ford%20F-150%20Raptor.png" alt="Ford F-150 Raptor">
+                        <span class="badge new">Nuevo</span>
+                        <div class="vehicle-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    </div>
+                    <div class="vehicle-detail-info">
+                        <h3>Ford F-150 Raptor 2024</h3>
+                        <div class="vehicle-price-detail">$1,105,000.00 MXN</div>
+
+                        <div class="stock-indicator">
+                            <i class="fas fa-layer-group"></i> Stock: <span>3</span>
+                        </div>
+
+                        <div class="vehicle-specs">
+                            <div class="spec-item"><i class="fas fa-calendar"></i><span>2024</span></div>
+                            <div class="spec-item"><i class="fas fa-cog"></i><span>V6 Turbo</span></div>
+                            <div class="spec-item"><i class="fas fa-road"></i><span>0 km</span></div>
+                            <div class="spec-item"><i class="fas fa-gas-pump"></i><span>Gasolina</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="vehicle-comparison">
+        <div class="container">
+            <h2>Comparador de Vehículos</h2>
+            <p>Selecciona hasta 3 vehículos para comparar especificaciones tecnicas</p>
+            <div class="comparison-table" id="comparison-dropzone">
+                <div class="comparison-placeholder" id="comparison-placeholder">
+                    <i class="fas fa-plus-circle"></i>
+                    <p>Arrastra vehiculos aqui para comparar</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #fff; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-shield-alt" style="color: var(--accent);"></i> GearSteed
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    Tu concesionaria de confianza. Calidad, seguridad y transparencia en cada kilometro.
+                </p>
+                <div class="socials">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h4>Explorar</h4>
+                <ul>
+                    <li><a href="index.html#inicio">Inicio</a></li>
+                    <li><a href="vehiculos.html">Inventario</a></li>
+                    <li><a href="historia.html">Refaccionaria</a></li>
+                    <li><a href="contactanos.html">Contacto</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4>Servicios</h4>
+                <ul>
+                    <li><a href="#">Venta de Vehiculos</a></li>
+                    <li><a href="#">Compra de Vehiculos</a></li>
+                    <li><a href="#">Servicio Tecnico</a></li>
+                    <li><a href="#">Creditos</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4>Contacto</h4>
+                <ul>
+                    <li style="color: var(--text-secondary);"><i class="fas fa-map-marker-alt" style="color: var(--accent); width: 20px;"></i> Av. Revolucion 1847</li>
+                    <li style="color: var(--text-secondary);"><i class="fas fa-phone" style="color: var(--accent); width: 20px;"></i> +52 967 133 0637</li>
+                    <li style="color: var(--text-secondary);"><i class="fas fa-envelope" style="color: var(--accent); width: 20px;"></i> ventas@GearSteed.mx</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 GearSteed. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+
+<script>
+    // 1. FILTRADO DE CATEGORÍAS
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    function aplicarFiltro() {
+        const activeBtn = document.querySelector('.filter-btn.active');
+        const filterValue = activeBtn.getAttribute('data-filter');
+        const vehicleCards = document.querySelectorAll('.vehicle-detail-card');
+
+        vehicleCards.forEach(card => {
+            const category = card.getAttribute('data-category');
+            if (filterValue === 'all') {
+                card.classList.remove('hidden-card');
+            } else {
+                if (category.includes(filterValue)) {
+                    card.classList.remove('hidden-card');
+                } else {
+                    card.classList.add('hidden-card');
+                }
+            }
+        });
+    }
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            aplicarFiltro();
+        });
+    });
+
+    // 2. ORDENAMIENTO
+    const sortSelect = document.getElementById('sortBy');
+    const grid = document.getElementById('vehicleGrid');
+
+    sortSelect.addEventListener('change', function() {
+        const sortValue = this.value;
+        const cards = Array.from(document.querySelectorAll('.vehicle-detail-card'));
+
+        cards.sort((a, b) => {
+            const getPrice = (card) => {
+                const priceText = card.querySelector('.vehicle-price-detail').textContent;
+                // Eliminar todo lo que no sea dígito, punto o signo menos
+                const numeric = priceText.replace(/[^\d.-]/g, '');
+                return parseFloat(numeric) || 0;
+            };
+
+            const priceA = getPrice(a);
+            const priceB = getPrice(b);
+
+            if (sortValue === 'price-low') return priceA - priceB;
+            if (sortValue === 'price-high') return priceB - priceA;
+            return a.getAttribute('data-index') - b.getAttribute('data-index');
+        });
+
+        cards.forEach(card => grid.appendChild(card));
+    });
+
+    // 3. CARGAR VEHÍCULOS
+    document.addEventListener("DOMContentLoaded", async () => {
+        checkSession();
+        await loadVehiclesFromDB();
+    });
+
+    async function loadVehiclesFromDB() {
+        const container = document.getElementById('vehicleGrid');
+        const datos = new URLSearchParams();
+        datos.append('action', 'get_vehicles');
+
+        try {
+            const response = await fetch('api_gearsteed.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: datos
+            });
+            const result = await response.json();
+
+            if (result.success && result.vehicles.length > 0) {
+                container.innerHTML = '';
+
+                result.vehicles.forEach((v, index) => {
+                    // CAMBIO A FORMATO MXN AL FINAL (MODIFICADO)
+                    const precioF = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v.precio);
+
+                    // Lógica para etiquetas cortas (badge)
+                    let badgeClass = v.estado === 'nuevo' ? 'badge new' : 'badge';
+                    let statusText = v.estado === 'nuevo' ? 'Nuevo' : 'Seminuevo';
+                    const dataCategory = `${v.tipo} ${v.estado}`.toLowerCase();
+
+                    const card = `
+                        <div class="vehicle-detail-card" data-category="${dataCategory}" draggable="true" data-id="${v.id}" data-index="${index}">
+                            <div class="vehicle-image-detail">
+                                <img src="${v.imagen}" alt="${v.marca} ${v.modelo}" onerror="this.src='img/placeholder_car.jpg'">
+                                <span class="${badgeClass}">${statusText}</span>
+                                <div class="vehicle-rating">
+                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                            <div class="vehicle-detail-info">
+                                <h3>${v.marca} ${v.modelo}</h3>
+                                <div class="vehicle-price-detail">
+                                     <span style="color: white; font-weight: 700; font-size: 1.4rem;">${precioF} MXN</span>
+                                </div>
+                                <div class="stock-indicator">
+                                    <i class="fas fa-layer-group"></i> Stock: <span>${v.stock}</span>
+                                </div>
+
+                                <div class="vehicle-specs">
+                                    <div class="spec-item"><i class="fas fa-calendar"></i><span>${v.anio}</span></div>
+                                    <div class="spec-item"><i class="fas fa-cog"></i><span>${v.motor}</span></div>
+                                    <div class="spec-item"><i class="fas fa-road"></i><span>${v.kilometraje} km</span></div>
+                                    <div class="spec-item"><i class="fas fa-gas-pump"></i><span>${v.combustible}</span></div>
+                                </div>
+                            </div>
+                        </div>`;
+
+                    container.innerHTML += card;
+                });
+
+                initDragAndDrop();
+            }
+        } catch (error) {
+            console.error("Error cargando BD, usando estáticos", error);
+        }
+    }
+
+    // 4. DRAG & DROP
+    function initDragAndDrop() {
+        document.querySelectorAll('.vehicle-detail-card').forEach(card => {
+            card.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('vehicleId', card.getAttribute('data-id'));
+            });
+        });
+    }
+
+    const dropzone = document.getElementById('comparison-dropzone');
+    const placeholder = document.getElementById('comparison-placeholder');
+    let comparedIds = [];
+
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.style.background = 'rgba(59, 130, 246, 0.1)';
+        dropzone.style.borderColor = 'var(--accent)';
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.style.background = 'rgba(0,0,0,0.2)';
+        dropzone.style.borderColor = 'var(--border-subtle)';
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.style.background = 'rgba(0,0,0,0.2)';
+        dropzone.style.borderColor = 'var(--border-subtle)';
+
+        const vehicleId = e.dataTransfer.getData('vehicleId');
+        if (!vehicleId || comparedIds.includes(vehicleId) || comparedIds.length >= 3) return;
+
+        const card = document.querySelector(`.vehicle-detail-card[data-id="${vehicleId}"]`);
+        if (card) {
+            const clone = card.cloneNode(true);
+            clone.classList.add('comparison-card');
+            clone.setAttribute('draggable', 'false');
+            clone.style.width = "250px";
+
+            clone.querySelector('.btn-full')?.remove();
+
+            const features = clone.querySelector('.vehicle-features');
+            if(features) features.style.display = 'none';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = 'Quitar';
+            removeBtn.className = 'btn-outline';
+            removeBtn.style.width = '100%';
+            removeBtn.style.marginTop = '8px';
+            removeBtn.onclick = function() {
+                dropzone.removeChild(clone);
+                comparedIds = comparedIds.filter(id => id !== vehicleId);
+                if (comparedIds.length === 0) placeholder.style.display = '';
+            };
+            clone.appendChild(removeBtn);
+
+            dropzone.appendChild(clone);
+            comparedIds.push(vehicleId);
+            placeholder.style.display = 'none';
+        }
+    });
+
+    // 5. FUNCIÓN DE LOGOUT ROBUSTA
+    // Renombrada para evitar conflicto con auth.js
+    window.cerrarSesionPHP = async function() {
+        const datos = new URLSearchParams();
+        datos.append('action', 'logout');
+
+        try {
+            const response = await fetch('api_gearsteed.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: datos
+            });
+            // Recargar página para limpiar sesión visual
+            window.location.reload();
+        } catch (e) {
+            console.error("Error al cerrar sesión:", e);
+            window.location.reload();
+        }
+    };
+
+    // 6. VERIFICAR SESIÓN (LÓGICA DINÁMICA)
+    async function checkSession() {
+        const menuContainer = document.getElementById('user-menu');
+        const datos = new URLSearchParams();
+        datos.append('action', 'check_session');
+
+        try {
+            const response = await fetch('api_gearsteed.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: datos
+            });
+            const result = await response.json();
+
+            // Si el usuario está logueado en PHP
+            if (result.success && result.logged_in) {
+                const nombreCompleto = result.user_name || "Usuario";
+                const nombreCorto = nombreCompleto.split(' ')[0]; // Tomar solo el primer nombre
+
+                // Inyectamos el HTML dinámico
+                menuContainer.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; line-height:1.2;">
+                            <span style="color:var(--text-secondary); font-size:0.75rem;">Bienvenido</span>
+                            <span style="color:white; font-weight:600; font-size: 0.95rem;">${nombreCorto}</span>
+                        </div>
+                        <button onclick="cerrarSesionPHP()"
+                                style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid #ef4444;
+                                       padding:8px 12px; border-radius:8px; cursor:pointer; font-size:0.85rem;
+                                       transition: 0.3s; display:flex; align-items:center; gap:5px;">
+                            <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+                        </button>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error("Error verificando sesión:", error);
+        }
+    }
+</script>
+</body>
+</html>

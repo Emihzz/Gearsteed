@@ -1,0 +1,211 @@
+/* ============================================
+   SISTEMA DE AUTENTICACIÓN Y CARRITO
+   ============================================ */
+
+/* Iconos de carrito y usuario en el header */
+.user-cart-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.cart-btn, .user-auth-section .login-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    background: rgba(var(--color-acento-rgba), 0.1);
+    border: 2px solid var(--color-acento);
+    color: var(--color-texto);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.cart-btn:hover, .user-auth-section .login-btn:hover {
+    background: var(--color-acento);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--color-acento-rgba), 0.3);
+}
+
+.cart-btn i, .user-auth-section .login-btn i {
+    font-size: 1.2rem;
+}
+
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 2px solid var(--color-superficie);
+    animation: cartPulse 2s ease-in-out infinite;
+}
+
+@keyframes cartPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Dropdown de usuario */
+.user-dropdown {
+    position: relative;
+}
+
+.user-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.2rem;
+    background: rgba(var(--color-acento-rgba), 0.1);
+    border: 2px solid var(--color-acento);
+    color: var(--color-texto);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.user-btn:hover {
+    background: var(--color-acento);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--color-acento-rgba), 0.3);
+}
+
+.user-btn i:first-child {
+    font-size: 1.3rem;
+}
+
+.user-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: var(--color-superficie);
+    min-width: 220px;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    border: 2px solid var(--color-acento);
+    z-index: 1001;
+    overflow: hidden;
+}
+
+.user-dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: var(--color-texto);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+    background: rgba(var(--color-acento-rgba), 0.2);
+    padding-left: 20px;
+}
+
+.user-dropdown-menu .dropdown-item i {
+    width: 18px;
+    text-align: center;
+    color: var(--color-acento);
+}
+
+.user-dropdown-menu hr {
+    margin: 0.5rem 0;
+    border: none;
+    border-top: 1px solid rgba(var(--color-acento-rgba), 0.2);
+}
+
+.logout-btn {
+    color: #dc3545 !important;
+}
+
+.logout-btn i {
+    color: #dc3545 !important;
+}
+
+.logout-btn:hover {
+    background: rgba(220, 53, 69, 0.1) !important;
+}
+
+/* Notificación de carrito */
+.cart-notification {
+    position: fixed;
+    top: 100px;
+    right: -400px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 10000;
+    transition: right 0.4s ease;
+    font-weight: 600;
+}
+
+.cart-notification.show {
+    right: 20px;
+}
+
+.cart-notification i {
+    font-size: 1.5rem;
+}
+
+/* Responsive para auth y carrito */
+@media (max-width: 768px) {
+    .user-cart-section {
+        gap: 0.8rem;
+    }
+    
+    .cart-btn span, .user-auth-section .login-btn span {
+        display: none;
+    }
+    
+    .cart-btn, .user-auth-section .login-btn, .user-btn {
+        padding: 0.6rem;
+    }
+    
+    .user-name {
+        display: none;
+    }
+    
+    .user-dropdown-menu {
+        right: -10px;
+    }
+}
